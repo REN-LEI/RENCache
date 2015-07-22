@@ -23,21 +23,28 @@
         [[RENCache sharedGlobalCache] setObjectValue:[NSNumber numberWithInt:a] forKey:[NSString stringWithFormat:@"%d",a]];
     }
     
-//    NSLog(@"%@",[[RENCache sharedGlobalCache] allKeys]);
-//    
-//    //[[RENCache sharedGlobalCache] clearAllCache];
-//    
-//    NSLog(@"~~%@",[[RENCache sharedGlobalCache] allKeys]);
+    NSLog(@"1===%@",[[RENCache sharedGlobalCache] allKeys]);
     
-//    [[RENCache sharedGlobalCache] setObjectValue:@"aaa" forKey:@"0"];
+    [[RENCache sharedGlobalCache] setObjectValue:@"aaa" forKey:@"0"];
+    
+    if ([[RENCache sharedGlobalCache] hasCacheForKey:@"0"]) {
+        NSLog(@"yes!");
+    }
+    NSLog(@"size =%f",[[RENCache sharedGlobalCache] getAllCacheSize]);
+    NSLog(@"size2 = %f",[[RENCache sharedGlobalCache] getSingleCacheSizeForKey:@"0"]);
+    
     [[RENCache sharedGlobalCache] setSeavCacheToDisk];
     
+    NSLog(@"2===%@",[[RENCache sharedGlobalCache] allKeys]);
 
 
-    
-//    [[RENCache sharedGlobalCache] clearAllCache];
-//    [[RENCache sharedGlobalCache] setObjectValue:@[@"1",@"d"] forKey:@"hhhhh"];
-//    NSLog(@"==%ld",(NSInteger)[[RENCache sharedGlobalCache] hasCacheForKey:@"hhhhh"]);
+    [[RENCache sharedGlobalCache] clearAllCache];
+
+    NSLog(@"3===%@",[[RENCache sharedGlobalCache] allKeys]);
+    if (![[RENCache sharedGlobalCache] hasCacheForKey:@"0"]) {
+        NSLog(@"NO!");
+    }
+
 }
 
 - (void)didReceiveMemoryWarning {

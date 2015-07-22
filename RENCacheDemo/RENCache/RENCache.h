@@ -36,7 +36,7 @@
 - (CGFloat)getAllCacheSize;
 /// 获取内存中的缓存大小
 - (CGFloat)getMemoryCacheSize;
-/// 获取单个缓存的大小
+/// 获取单个磁盘缓存的大小
 - (CGFloat)getSingleCacheSizeForKey:(NSString *)key;
 
 
@@ -44,7 +44,7 @@
 - (void)clearAllCache;
 /// 删除内存中的缓存
 - (void)clearMemoryCache;
-/// 删除单个缓存
+/// 删除单个磁盘缓存
 - (void)removeCacheForKey:(NSString *)key;
 
 

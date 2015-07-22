@@ -12,22 +12,34 @@
 	<dict>
 		<key>8F80B70ABE3D1DD1BA173412F83C114F3471A68A</key>
 		<string>github.com:Mr-REN/CacheManage.git</string>
+		<key>F29E721ECA00701873505EE075DCB01464D8D30D</key>
+		<string>github.com:REN-LEI/RENCache.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>RENCacheDemo/RENCacheDemo.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>8F80B70ABE3D1DD1BA173412F83C114F3471A68A</key>
-		<string>../../..</string>
+		<string>../../../../RENCache</string>
+		<key>F29E721ECA00701873505EE075DCB01464D8D30D</key>
+		<string>../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>github.com:Mr-REN/CacheManage.git</string>
+	<string>github.com:REN-LEI/RENCache.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>8F80B70ABE3D1DD1BA173412F83C114F3471A68A</string>
+	<string>F29E721ECA00701873505EE075DCB01464D8D30D</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>F29E721ECA00701873505EE075DCB01464D8D30D</string>
+			<key>IDESourceControlWCCName</key>
+			<string></string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
@@ -35,6 +47,14 @@
 			<string>8F80B70ABE3D1DD1BA173412F83C114F3471A68A</string>
 			<key>IDESourceControlWCCName</key>
 			<string>RENCache</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>F29E721ECA00701873505EE075DCB01464D8D30D</string>
+			<key>IDESourceControlWCCName</key>
+			<string>RENCacheDemo</string>
 		</dict>
 	</array>
 </dict>
