@@ -11,32 +11,26 @@
 
 @interface RENCache : NSObject
 
-/// 默认缓存过期时间无限,可设置缺省缓存时长（秒）
+/// 默认缓存过期时间无限,可设置默认缓存时长（秒）
 @property(nonatomic) NSTimeInterval defaultTimeoutInterval;
-/// 内存中最大保存个数，缺省为10，（最常使用排序）
+/// 内存中最大保存个数，默认为10，（最常使用排序）
 @property(nonatomic) NSInteger defaultCacheMemoryLimit;
 
 /// 单利
 + (RENCache *)sharedGlobalCache;
 
 
-/// 获取当前缓存下所有key（包含内存缓存）
+/// 获取磁盘缓存所有key
 - (NSArray *)allKeys;
 
 
-/// 判断key是否有对应缓存（包含内存缓存）
+/// 判断key是否有对应缓存
 - (BOOL)hasCacheForKey:(NSString *)key;
 
 
-/// 将内存缓存保存到磁盘
-- (void)setSeavCacheToDisk;
-
-
-/// 获取全部缓存大小（磁盘）
+/// 获取磁盘全部缓存大小
 - (CGFloat)getAllCacheSize;
-/// 获取内存中的缓存大小
-- (CGFloat)getMemoryCacheSize;
-/// 获取单个磁盘缓存的大小
+/// 获取单个缓存的大小
 - (CGFloat)getSingleCacheSizeForKey:(NSString *)key;
 
 
@@ -44,7 +38,7 @@
 - (void)clearAllCache;
 /// 删除内存中的缓存
 - (void)clearMemoryCache;
-/// 删除单个磁盘缓存
+/// 删除单个缓存
 - (void)removeCacheForKey:(NSString *)key;
 
 
