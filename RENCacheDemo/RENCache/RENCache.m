@@ -196,16 +196,17 @@ static inline NSString *cachePathForKey(NSString* key) {
 #pragma mark - image methods
 - (UIImage *)imageObjectForKey:(NSString *)key {
     
-    if (!key) {
-        return nil;
+    if (key) {
+        __block NSData *data;
+        dispatch_sync(_cacheInfoQueue, ^{
+            data = [self objectForKey:key];
+        });
+        
+        if (data) {
+            return [UIImage imageWithData:data];
+        }
     }
-    
-    __block NSData *data;
-    dispatch_sync(_cacheInfoQueue, ^{
-        data = [self objectForKey:key];
-    });
-    
-    return [UIImage imageWithData:data];
+    return nil;
 }
 - (void)setImage:(UIImage *)image forKey:(NSString *)key {
     
@@ -237,7 +238,12 @@ static inline NSString *cachePathForKey(NSString* key) {
         data = [_memoryCacheInfo objectForKey:key];
         
         if (!data) {
-            data = [NSData dataWithContentsOfFile:cachePathForKey(key) options:0 error:NULL];
+            
+            if ([self hasCacheForKey:key]) {
+                data = [NSData dataWithContentsOfFile:cachePathForKey(key) options:0 error:NULL];
+            } else {
+                data = nil;
+            }
         }
     });
     
@@ -256,7 +262,7 @@ static inline NSString *cachePathForKey(NSString* key) {
 }
 
 - (void)setObjectValue:(id)value forKey:(NSString *)key withTimeoutInterval:(NSTimeInterval)timeoutInterval {
-
+    
     if (!value || !key) {
         return;
     }
