@@ -52,7 +52,7 @@ static inline NSString *cachePathForKey(NSString* key) {
         _defaultCacheMemoryLimit = 10;
         
         _memoryCache = [[NSCache alloc] init];
-        _memoryCache.countLimit = 10;
+        _memoryCache.countLimit = _defaultCacheMemoryLimit;
         
         _diskCachePlist = [NSMutableDictionary dictionaryWithContentsOfFile:cachePathForKey(kDefaultPlist)];
         NSLog(@"cachePathForKey(kDefaultPlist)==%@",cachePathForKey(kDefaultPlist));
