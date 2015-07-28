@@ -13,7 +13,7 @@
 
 /// 默认缓存过期时间无限,可设置默认缓存时长（秒）
 @property(nonatomic) NSTimeInterval defaultTimeoutInterval;
-/// 内存中最大保存个数，默认为10，（最常使用排序）
+/// 内存中最大保存个数，默认为10
 @property(nonatomic) NSInteger defaultCacheMemoryLimit;
 
 /// 单利

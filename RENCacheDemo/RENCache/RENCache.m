@@ -233,7 +233,7 @@ static inline NSString *cachePathForKey(NSString* key) {
     if (key) {
         
         if ([_memoryCache objectForKey:key]) {
-          
+
             return [_memoryCache objectForKey:key];
         }
         
@@ -287,6 +287,13 @@ static inline NSString *cachePathForKey(NSString* key) {
         [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
     });
     
+}
+
+#pragma mark -
+#pragma mark - CacheMemoryLimit
+- (void)setDefaultCacheMemoryLimit:(NSInteger)defaultCacheMemoryLimit {
+    _defaultCacheMemoryLimit = defaultCacheMemoryLimit;
+    _memoryCache.countLimit = defaultCacheMemoryLimit;
 }
 
 @end
