@@ -27,11 +27,12 @@
 /// 判断key是否有对应缓存
 - (BOOL)hasCacheForKey:(NSString *)key;
 
-
+/// 获取磁盘缓存个数
+- (NSUInteger)getAllCacheCount;
 /// 获取磁盘全部缓存大小
-- (CGFloat)getAllCacheSize;
+- (NSUInteger)getAllCacheSize;
 /// 获取单个缓存的大小
-- (CGFloat)getSingleCacheSizeForKey:(NSString *)key;
+- (NSUInteger)getSingleCacheSizeForKey:(NSString *)key;
 
 
 /// 清除全部缓存（包括内存中的缓存）

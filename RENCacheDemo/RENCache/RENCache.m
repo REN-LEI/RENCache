@@ -8,7 +8,7 @@
 
 #import "RENCache.h"
 
-static NSString *const defaultPlist = @"RENCache.plist";
+static NSString *const kDefaultPlist = @"RENCache.plist";
 
 static inline NSString *defaultCachePath() {
     NSString *cachesDirectory = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0];
@@ -44,23 +44,23 @@ static inline NSString *cachePathForKey(NSString* key) {
     
     if (self = [super init]) {
         
-        self.cacheInfoQueue = dispatch_queue_create("com.rencache.info", NULL);
+        _cacheInfoQueue = dispatch_queue_create("com.rencache.info", NULL);
         dispatch_queue_t priority = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
         dispatch_set_target_queue(priority, _cacheInfoQueue);
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clearMemoryCache) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
         
-        self.defaultTimeoutInterval = 0;
-        self.defaultCacheMemoryLimit = 10;
+        _defaultTimeoutInterval = 0;
+        _defaultCacheMemoryLimit = 10;
         
-        self.recentlyAccessedKeys = [[NSMutableArray alloc] init];
-        self.memoryCacheInfo = [[NSMutableDictionary alloc] init];
+        _recentlyAccessedKeys = [[NSMutableArray alloc] init];
+        _memoryCacheInfo = [[NSMutableDictionary alloc] init];
         
-        self.diskCachePlist = [NSMutableDictionary dictionaryWithContentsOfFile:cachePathForKey(defaultPlist)];
-        
+        _diskCachePlist = [NSMutableDictionary dictionaryWithContentsOfFile:cachePathForKey(kDefaultPlist)];
+        NSLog(@"cachePathForKey(kDefaultPlist)==%@",cachePathForKey(kDefaultPlist));
         if (!_diskCachePlist) {
             
-            self.diskCachePlist = [[NSMutableDictionary alloc] init];
+            _diskCachePlist = [[NSMutableDictionary alloc] init];
         }
         
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -73,18 +73,22 @@ static inline NSString *cachePathForKey(NSString* key) {
             
             dispatch_sync(_cacheInfoQueue, ^{
                 
+                BOOL isChange = NO;
                 for(NSString *key in _diskCachePlist.allKeys) {
                     
                     if ([_diskCachePlist[key] isKindOfClass:[NSDate class]]) {
                         
                         if([_diskCachePlist[key] timeIntervalSinceReferenceDate] <= now) {
                             
+                            isChange = YES;
                             [fileManager removeItemAtPath:cachePathForKey(key) error:NULL];
                             [removedKeys addObject:key];
                         }
                     }
                 }
-                [self.diskCachePlist writeToFile:cachePathForKey(defaultPlist) atomically:YES];
+                if (isChange) {
+                    [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+                }
             });
         } else {
             
@@ -99,19 +103,25 @@ static inline NSString *cachePathForKey(NSString* key) {
     static RENCache *instanceCache;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instanceCache = [[[self class] alloc] init];
+        instanceCache = [[self alloc] init];
     });
     
     return instanceCache;
 }
+#pragma mark -
+#pragma mark - cacheSize methods
+- (NSUInteger)getAllCacheCount {
+    
+    return _diskCachePlist.count;
+}
 
 #pragma mark -
 #pragma mark - cacheSize methods
-- (CGFloat)getAllCacheSize {
+- (NSUInteger)getAllCacheSize {
     
     NSUInteger size = 0;
     
-    for (NSString *key in self.allKeys) {
+    for (NSString *key in [self allKeys]) {
         
         NSString *path = cachePathForKey(key);
         NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
@@ -120,7 +130,7 @@ static inline NSString *cachePathForKey(NSString* key) {
     return size;
 }
 
-- (CGFloat)getSingleCacheSizeForKey:(NSString *)key {
+- (NSUInteger)getSingleCacheSizeForKey:(NSString *)key {
     
     NSUInteger size = 0;
     
@@ -137,9 +147,7 @@ static inline NSString *cachePathForKey(NSString* key) {
 #pragma mark - getAllKeys methods
 - (NSArray *)allKeys {
     
-    NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithDictionary:(NSDictionary *)_diskCachePlist];
-    
-    return [temp allKeys];
+    return [_diskCachePlist allKeys];
 }
 
 
@@ -160,8 +168,8 @@ static inline NSString *cachePathForKey(NSString* key) {
             [[NSFileManager defaultManager] removeItemAtPath:cachePathForKey(key) error:NULL];
         }
         
-        [self.diskCachePlist removeAllObjects];
-        [self.diskCachePlist writeToFile:cachePathForKey(defaultPlist) atomically:YES];
+        [_diskCachePlist removeAllObjects];
+        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
         [self clearMemoryCache];
     });
     
@@ -169,44 +177,42 @@ static inline NSString *cachePathForKey(NSString* key) {
 
 - (void)clearMemoryCache {
     
-    [self.recentlyAccessedKeys removeAllObjects];
-    [self.memoryCacheInfo removeAllObjects];
+    [_recentlyAccessedKeys removeAllObjects];
+    [_memoryCacheInfo removeAllObjects];
 }
 
 - (void)removeCacheForKey:(NSString *)key {
     
-    NSAssert(![key isEqualToString:defaultPlist] , @"RENCache.plist 不可以删除");
+    NSAssert(![key isEqualToString:kDefaultPlist] , @"RENCache.plist 不可以删除");
     
     dispatch_async(_cacheInfoQueue, ^{
         
         [[NSFileManager defaultManager] removeItemAtPath:cachePathForKey(key) error:NULL];
-        [self.diskCachePlist removeObjectForKey:key];
-        [self.diskCachePlist writeToFile:cachePathForKey(defaultPlist) atomically:YES];
+        [_diskCachePlist removeObjectForKey:key];
+        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
         
         if (_memoryCacheInfo[key]) {
             
-            [self.memoryCacheInfo removeObjectForKey:key];
-            [self.recentlyAccessedKeys removeObject:key];
+            [_memoryCacheInfo removeObjectForKey:key];
+            [_recentlyAccessedKeys removeObject:key];
         }
     });
-    
 }
 
 #pragma mark -
 #pragma mark - image methods
 - (UIImage *)imageObjectForKey:(NSString *)key {
     
+    UIImage *image = nil;
     if (key) {
-        __block NSData *data;
-        dispatch_sync(_cacheInfoQueue, ^{
-            data = [self objectForKey:key];
-        });
+        
+        NSData *data = [self objectForKey:key];
         
         if (data) {
-            return [UIImage imageWithData:data];
+            image =  [UIImage imageWithData:data];
         }
     }
-    return nil;
+    return image;
 }
 - (void)setImage:(UIImage *)image forKey:(NSString *)key {
     
@@ -228,30 +234,28 @@ static inline NSString *cachePathForKey(NSString* key) {
 #pragma mark - object methods
 - (id)objectForKey:(NSString *)key {
     
-    if (!key) {
-        return nil;
-    }
-    __block NSData *data;
-    
-    dispatch_sync(_cacheInfoQueue, ^{
+    if (key) {
         
-        data = [_memoryCacheInfo objectForKey:key];
+        __block NSData *data = nil;
         
-        if (!data) {
+        dispatch_sync(_cacheInfoQueue, ^{
             
-            if ([self hasCacheForKey:key]) {
-                data = [NSData dataWithContentsOfFile:cachePathForKey(key) options:0 error:NULL];
-            } else {
-                data = nil;
+            data = [_memoryCacheInfo objectForKey:key];
+            
+            if (!data) {
+                
+                if ([self hasCacheForKey:key]) {
+                    data = [NSData dataWithContentsOfFile:cachePathForKey(key) options:0 error:NULL];
+                }
             }
+        });
+        
+        if (data) {
+            
+            [self setMemoryCacheData:data forKey:key];
+            
+            return [NSKeyedUnarchiver unarchiveObjectWithData:data];
         }
-    });
-    
-    if (data) {
-        
-        [self setMemoryCacheData:data forKey:key];
-        
-        return [NSKeyedUnarchiver unarchiveObjectWithData:data];
     }
     return nil;
 }
@@ -274,14 +278,14 @@ static inline NSString *cachePathForKey(NSString* key) {
 #pragma mark - data methods
 - (void)setDataValue:(NSData *)value forKey:(NSString*)key withTimeoutInterval:(NSTimeInterval)timeoutInterval {
     
-    NSAssert(![key isEqualToString:defaultPlist] , @"RENCache.plist 不可保存或修改默认的plist");
+    NSAssert(![key isEqualToString:kDefaultPlist] , @"RENCache.plist 不可保存或修改默认的plist");
     
     dispatch_sync(_cacheInfoQueue, ^{
         
         [value writeToFile:cachePathForKey(key) atomically:YES];
         id obj = timeoutInterval > 0 ? [NSDate dateWithTimeIntervalSinceNow:timeoutInterval] : @0;
-        [self.diskCachePlist setObject:obj forKey:key];
-        [self.diskCachePlist writeToFile:cachePathForKey(defaultPlist) atomically:YES];
+        [_diskCachePlist setObject:obj forKey:key];
+        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
     });
     
     [self setMemoryCacheData:value forKey:key];
@@ -293,11 +297,11 @@ static inline NSString *cachePathForKey(NSString* key) {
     
     dispatch_sync(_cacheInfoQueue, ^{
         
-        [self.memoryCacheInfo setObject:data forKey:key];
+        [_memoryCacheInfo setObject:data forKey:key];
         
         if ([_recentlyAccessedKeys containsObject:key]) {
             
-            [self.recentlyAccessedKeys removeObject:key];
+            [_recentlyAccessedKeys removeObject:key];
         }
         
         [self.recentlyAccessedKeys insertObject:key atIndex:0];
@@ -305,8 +309,8 @@ static inline NSString *cachePathForKey(NSString* key) {
         if (_recentlyAccessedKeys.count > _defaultCacheMemoryLimit) {
             
             NSString *leastRecentlyUsedKey = [_recentlyAccessedKeys lastObject];
-            [self.recentlyAccessedKeys removeLastObject];
-            [self.memoryCacheInfo removeObjectForKey:leastRecentlyUsedKey];
+            [_recentlyAccessedKeys removeLastObject];
+            [_memoryCacheInfo removeObjectForKey:leastRecentlyUsedKey];
         }
     });
 }
