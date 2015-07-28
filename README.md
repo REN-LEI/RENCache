@@ -2,9 +2,9 @@
 
 
 ````
-/// 默认缓存过期时间无限,可设置缺省缓存时长（秒）
+/// 默认缓存过期时间无限,可设置默认缓存时长（秒）
 @property(nonatomic) NSTimeInterval defaultTimeoutInterval;
-/// 内存中最大保存个数，缺省为10，（最常使用排序）
+/// 内存中最大保存个数，默认为10
 @property(nonatomic) NSInteger defaultCacheMemoryLimit;
 
 /// 单利
@@ -18,11 +18,12 @@
 /// 判断key是否有对应缓存
 - (BOOL)hasCacheForKey:(NSString *)key;
 
-
+/// 获取磁盘缓存个数
+- (NSUInteger)getAllCacheCount;
 /// 获取磁盘全部缓存大小
-- (CGFloat)getAllCacheSize;
+- (NSUInteger)getAllCacheSize;
 /// 获取单个缓存的大小
-- (CGFloat)getSingleCacheSizeForKey:(NSString *)key;
+- (NSUInteger)getSingleCacheSizeForKey:(NSString *)key;
 
 
 /// 清除全部缓存（包括内存中的缓存）
@@ -47,7 +48,6 @@
 - (void)setObjectValue:(id)value forKey:(NSString *)key;
 /// 根据key写入value  @param timeoutInterval 设置缓存时长(秒) @note 当value为自定义对象,必须实现NSCoding协议
 - (void)setObjectValue:(id)value forKey:(NSString *)key withTimeoutInterval:(NSTimeInterval)timeoutInterval;
-
 
 ````
 
