@@ -23,12 +23,10 @@ static inline NSString *cachePathForKey(NSString* key) {
 
 /// 磁盘中的缓存，plist管理
 @property (strong, nonatomic) NSMutableDictionary *diskCachePlist;
-/// 最近访问的内存中的缓存
-@property (strong, nonatomic) NSMutableArray *recentlyAccessedKeys;
-/// 内存中的缓存
-@property (strong, nonatomic) NSMutableDictionary *memoryCacheInfo;
 
 @property (strong, nonatomic) dispatch_queue_t cacheInfoQueue;
+
+@property (strong, nonatomic) NSCache *memoryCache;
 
 @end
 
@@ -53,8 +51,8 @@ static inline NSString *cachePathForKey(NSString* key) {
         _defaultTimeoutInterval = 0;
         _defaultCacheMemoryLimit = 10;
         
-        _recentlyAccessedKeys = [[NSMutableArray alloc] init];
-        _memoryCacheInfo = [[NSMutableDictionary alloc] init];
+        _memoryCache = [[NSCache alloc] init];
+        _memoryCache.countLimit = 10;
         
         _diskCachePlist = [NSMutableDictionary dictionaryWithContentsOfFile:cachePathForKey(kDefaultPlist)];
         NSLog(@"cachePathForKey(kDefaultPlist)==%@",cachePathForKey(kDefaultPlist));
@@ -177,8 +175,8 @@ static inline NSString *cachePathForKey(NSString* key) {
 
 - (void)clearMemoryCache {
     
-    [_recentlyAccessedKeys removeAllObjects];
-    [_memoryCacheInfo removeAllObjects];
+    [_memoryCache removeAllObjects];
+
 }
 
 - (void)removeCacheForKey:(NSString *)key {
@@ -191,11 +189,8 @@ static inline NSString *cachePathForKey(NSString* key) {
         [_diskCachePlist removeObjectForKey:key];
         [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
         
-        if (_memoryCacheInfo[key]) {
-            
-            [_memoryCacheInfo removeObjectForKey:key];
-            [_recentlyAccessedKeys removeObject:key];
-        }
+        [_memoryCache removeObjectForKey:key];
+
     });
 }
 
@@ -204,6 +199,7 @@ static inline NSString *cachePathForKey(NSString* key) {
 - (UIImage *)imageObjectForKey:(NSString *)key {
     
     UIImage *image = nil;
+    
     if (key) {
         
         NSData *data = [self objectForKey:key];
@@ -236,12 +232,14 @@ static inline NSString *cachePathForKey(NSString* key) {
     
     if (key) {
         
-        __block NSData *data = nil;
+        if ([_memoryCache objectForKey:key]) {
+          
+            return [_memoryCache objectForKey:key];
+        }
         
+         __block NSData *data ;
         dispatch_sync(_cacheInfoQueue, ^{
-            
-            data = [_memoryCacheInfo objectForKey:key];
-            
+           
             if (!data) {
                 
                 if ([self hasCacheForKey:key]) {
@@ -252,9 +250,8 @@ static inline NSString *cachePathForKey(NSString* key) {
         
         if (data) {
             
-            [self setMemoryCacheData:data forKey:key];
-            
-            return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            id value = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            return value;
         }
     }
     return nil;
@@ -271,6 +268,8 @@ static inline NSString *cachePathForKey(NSString* key) {
         return;
     }
     
+    [_memoryCache setObject:value forKey:key];
+
     [self setDataValue:[NSKeyedArchiver archivedDataWithRootObject:value] forKey:key withTimeoutInterval:timeoutInterval];
 }
 
@@ -288,32 +287,6 @@ static inline NSString *cachePathForKey(NSString* key) {
         [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
     });
     
-    [self setMemoryCacheData:value forKey:key];
-    
 }
-#pragma mark -
-#pragma mark - memory methods
-- (void)setMemoryCacheData:(NSData *)data forKey:(NSString *)key {
-    
-    dispatch_sync(_cacheInfoQueue, ^{
-        
-        [_memoryCacheInfo setObject:data forKey:key];
-        
-        if ([_recentlyAccessedKeys containsObject:key]) {
-            
-            [_recentlyAccessedKeys removeObject:key];
-        }
-        
-        [self.recentlyAccessedKeys insertObject:key atIndex:0];
-        
-        if (_recentlyAccessedKeys.count > _defaultCacheMemoryLimit) {
-            
-            NSString *leastRecentlyUsedKey = [_recentlyAccessedKeys lastObject];
-            [_recentlyAccessedKeys removeLastObject];
-            [_memoryCacheInfo removeObjectForKey:leastRecentlyUsedKey];
-        }
-    });
-}
-
 
 @end
