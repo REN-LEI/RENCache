@@ -153,7 +153,12 @@ static inline NSString *cachePathForKey(NSString* key) {
 #pragma mark - has methods
 - (BOOL)hasCacheForKey:(NSString *)key {
     
-    return [[NSFileManager defaultManager] fileExistsAtPath:cachePathForKey(key)];
+    __block BOOL res = NO;
+    dispatch_sync(_cacheInfoQueue, ^{
+        
+        res = [[NSFileManager defaultManager] fileExistsAtPath:cachePathForKey(key)];
+    });
+    return res;
 }
 
 #pragma mark -
@@ -176,7 +181,7 @@ static inline NSString *cachePathForKey(NSString* key) {
 - (void)clearMemoryCache {
     
     [_memoryCache removeAllObjects];
-
+    
 }
 
 - (void)removeCacheForKey:(NSString *)key {
@@ -190,7 +195,7 @@ static inline NSString *cachePathForKey(NSString* key) {
         [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
         
         [_memoryCache removeObjectForKey:key];
-
+        
     });
 }
 
@@ -233,27 +238,21 @@ static inline NSString *cachePathForKey(NSString* key) {
     if (key) {
         
         if ([_memoryCache objectForKey:key]) {
-
+            
             return [_memoryCache objectForKey:key];
         }
         
-         __block NSData *data ;
-        dispatch_sync(_cacheInfoQueue, ^{
-           
-            if (!data) {
-                
-                if ([self hasCacheForKey:key]) {
-                    data = [NSData dataWithContentsOfFile:cachePathForKey(key) options:0 error:NULL];
-                }
-            }
-        });
-        
-        if (data) {
+        if ([self hasCacheForKey:key]) {
             
-            id value = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-            return value;
+            NSData *data = [NSData dataWithContentsOfFile:cachePathForKey(key) options:0 error:NULL];
+            
+            if (data) {
+
+                return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            }
         }
     }
+    
     return nil;
 }
 
@@ -269,7 +268,7 @@ static inline NSString *cachePathForKey(NSString* key) {
     }
     
     [_memoryCache setObject:value forKey:key];
-
+    
     [self setDataValue:[NSKeyedArchiver archivedDataWithRootObject:value] forKey:key withTimeoutInterval:timeoutInterval];
 }
 
