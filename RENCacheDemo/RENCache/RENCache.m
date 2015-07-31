@@ -55,7 +55,7 @@ static inline NSString *cachePathForKey(NSString* key) {
         _memoryCache.countLimit = _defaultCacheMemoryLimit;
         
         _diskCachePlist = [NSMutableDictionary dictionaryWithContentsOfFile:cachePathForKey(kDefaultPlist)];
-
+        NSLog(@"cachePathForKey(kDefaultPlist)==%@",cachePathForKey(kDefaultPlist));
         if (!_diskCachePlist) {
             
             _diskCachePlist = [[NSMutableDictionary alloc] init];
@@ -65,7 +65,7 @@ static inline NSString *cachePathForKey(NSString* key) {
         
         if([fileManager fileExistsAtPath:defaultCachePath()]) {
             
-            NSMutableArray *removedKeys = [[NSMutableArray alloc] init];
+            NSMutableDictionary *removedKeys = [[NSMutableDictionary alloc] init];
             
             NSTimeInterval now = [[NSDate date] timeIntervalSinceReferenceDate];
             
@@ -80,12 +80,17 @@ static inline NSString *cachePathForKey(NSString* key) {
                             
                             isChange = YES;
                             [fileManager removeItemAtPath:cachePathForKey(key) error:NULL];
-                            [removedKeys addObject:key];
+                            [removedKeys removeObjectForKey:key];
                         }
                     }
                 }
                 if (isChange) {
+                    NSLog(@"re==%@",removedKeys.allValues);
+                    NSLog(@"-=== %@",_diskCachePlist.allValues);
+                    _diskCachePlist = removedKeys;
                     [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+                    NSLog(@"-=== %@",_diskCachePlist.allValues);
+
                 }
             });
         } else {
@@ -237,17 +242,38 @@ static inline NSString *cachePathForKey(NSString* key) {
     
     if (key) {
         
-        if ([_memoryCache objectForKey:key]) {
-            
-            return [_memoryCache objectForKey:key];
-        }
-        
         if ([self hasCacheForKey:key]) {
+            
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            
+            if ([_diskCachePlist[key] isKindOfClass:[NSDate class]]) {
+                
+                NSTimeInterval now = [[NSDate date] timeIntervalSinceReferenceDate];
+                
+                if([_diskCachePlist[key] timeIntervalSinceReferenceDate] <= now) {
+                    
+                    dispatch_async(_cacheInfoQueue, ^{
+                        
+                        [fileManager removeItemAtPath:cachePathForKey(key) error:NULL];
+                        [_diskCachePlist removeObjectForKey:key];
+                        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+                        
+                        [_memoryCache removeObjectForKey:key];
+        
+                    });
+                    return nil;
+                }
+            }
+            
+            if ([_memoryCache objectForKey:key]) {
+                
+                return [_memoryCache objectForKey:key];
+            }
             
             NSData *data = [NSData dataWithContentsOfFile:cachePathForKey(key) options:0 error:NULL];
             
             if (data) {
-
+                
                 return [NSKeyedUnarchiver unarchiveObjectWithData:data];
             }
         }
