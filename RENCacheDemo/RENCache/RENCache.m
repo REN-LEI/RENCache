@@ -55,7 +55,7 @@ static inline NSString *cachePathForKey(NSString* key) {
         _memoryCache.countLimit = _defaultCacheMemoryLimit;
         
         _diskCachePlist = [NSMutableDictionary dictionaryWithContentsOfFile:cachePathForKey(kDefaultPlist)];
-        NSLog(@"cachePathForKey(kDefaultPlist)==%@",cachePathForKey(kDefaultPlist));
+
         if (!_diskCachePlist) {
             
             _diskCachePlist = [[NSMutableDictionary alloc] init];
@@ -85,12 +85,9 @@ static inline NSString *cachePathForKey(NSString* key) {
                     }
                 }
                 if (isChange) {
-                    NSLog(@"re==%@",removedKeys.allValues);
-                    NSLog(@"-=== %@",_diskCachePlist.allValues);
+                    
                     _diskCachePlist = removedKeys;
                     [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
-                    NSLog(@"-=== %@",_diskCachePlist.allValues);
-
                 }
             });
         } else {
