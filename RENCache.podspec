@@ -6,8 +6,8 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   s.authors      =  { “任磊" => "https://github.com/REN-LEI" }
   s.platform     = :ios, "7.0"
-  s.source       = { :git => "https://github.com/REN-LEI/RENCache.git", :tag => "v1.0" }
+  s.source       = { :git => "https://github.com/REN-LEI/RENCache.git", :tag => s.version }
   s.frameworks   = 'Foundation', 'UIKit'     
-  s.source_files = 'RENCache'
+  s.source_files = 'RENCache.{h,m}'
   s.requires_arc = true
 end
