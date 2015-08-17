@@ -14,7 +14,7 @@
 		70A8283C1B3A4F7D004F8EF8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 70A8283B1B3A4F7D004F8EF8 /* Images.xcassets */; };
 		70A8283F1B3A4F7D004F8EF8 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 70A8283D1B3A4F7D004F8EF8 /* LaunchScreen.xib */; };
 		70A8284B1B3A4F7D004F8EF8 /* RENCacheDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A8284A1B3A4F7D004F8EF8 /* RENCacheDemoTests.m */; };
-		70A828571B3A4F9F004F8EF8 /* RENCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A828561B3A4F9F004F8EF8 /* RENCache.m */; };
+		70C761B01B81AED30058F81C /* RENCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 70C761AF1B81AED30058F81C /* RENCache.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,8 +41,8 @@
 		70A828441B3A4F7D004F8EF8 /* RENCacheDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RENCacheDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		70A828491B3A4F7D004F8EF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		70A8284A1B3A4F7D004F8EF8 /* RENCacheDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RENCacheDemoTests.m; sourceTree = "<group>"; };
-		70A828551B3A4F9F004F8EF8 /* RENCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RENCache.h; sourceTree = "<group>"; };
-		70A828561B3A4F9F004F8EF8 /* RENCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RENCache.m; sourceTree = "<group>"; };
+		70C761AE1B81AED30058F81C /* RENCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RENCache.h; sourceTree = "<group>"; };
+		70C761AF1B81AED30058F81C /* RENCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RENCache.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +66,7 @@
 		70A828221B3A4F7D004F8EF8 = {
 			isa = PBXGroup;
 			children = (
-				70A828541B3A4F9F004F8EF8 /* RENCache */,
+				70C761AD1B81AED30058F81C /* RENCache */,
 				70A8282D1B3A4F7D004F8EF8 /* RENCacheDemo */,
 				70A828471B3A4F7D004F8EF8 /* RENCacheDemoTests */,
 				70A8282C1B3A4F7D004F8EF8 /* Products */,
@@ -123,11 +123,11 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		70A828541B3A4F9F004F8EF8 /* RENCache */ = {
+		70C761AD1B81AED30058F81C /* RENCache */ = {
 			isa = PBXGroup;
 			children = (
-				70A828551B3A4F9F004F8EF8 /* RENCache.h */,
-				70A828561B3A4F9F004F8EF8 /* RENCache.m */,
+				70C761AE1B81AED30058F81C /* RENCache.h */,
+				70C761AF1B81AED30058F81C /* RENCache.m */,
 			);
 			path = RENCache;
 			sourceTree = "<group>";
@@ -234,7 +234,7 @@
 			files = (
 				70A828371B3A4F7D004F8EF8 /* ViewController.m in Sources */,
 				70A828341B3A4F7D004F8EF8 /* AppDelegate.m in Sources */,
-				70A828571B3A4F9F004F8EF8 /* RENCache.m in Sources */,
+				70C761B01B81AED30058F81C /* RENCache.m in Sources */,
 				70A828311B3A4F7D004F8EF8 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
