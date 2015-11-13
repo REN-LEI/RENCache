@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "F29E721ECA00701873505EE075DCB01464D8D30D+++83B8D77",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "F29E721ECA00701873505EE075DCB01464D8D30D+++83B8D77" : 0,
+    "F29E721ECA00701873505EE075DCB01464D8D30D+++E670725" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "F109DB55-7541-427E-BE9A-665C0B1DCCBD",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "F29E721ECA00701873505EE075DCB01464D8D30D+++83B8D77" : "RENCacheDemo",
+    "F29E721ECA00701873505EE075DCB01464D8D30D+++E670725" : ""
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "RENCacheDemo",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "RENCacheDemo\/RENCacheDemo.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:REN-LEI\/RENCache.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F29E721ECA00701873505EE075DCB01464D8D30D+++83B8D77"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:REN-LEI\/RENCache.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F29E721ECA00701873505EE075DCB01464D8D30D+++E670725"
+    }
+  ]
+}

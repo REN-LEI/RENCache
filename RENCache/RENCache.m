@@ -55,7 +55,7 @@ static inline NSString *cachePathForKey(NSString* key) {
         _memoryCache.countLimit = _defaultCacheMemoryLimit;
         
         _diskCachePlist = [NSMutableDictionary dictionaryWithContentsOfFile:cachePathForKey(kDefaultPlist)];
-
+        
         if (!_diskCachePlist) {
             
             _diskCachePlist = [[NSMutableDictionary alloc] init];
@@ -69,14 +69,17 @@ static inline NSString *cachePathForKey(NSString* key) {
             
             NSTimeInterval now = [[NSDate date] timeIntervalSinceReferenceDate];
             
+            __weak typeof(self)weakSelf = self;
+            
             dispatch_sync(_cacheInfoQueue, ^{
                 
                 BOOL isChange = NO;
-                for(NSString *key in _diskCachePlist.allKeys) {
+                
+                for(NSString *key in weakSelf.diskCachePlist.allKeys) {
                     
-                    if ([_diskCachePlist[key] isKindOfClass:[NSDate class]]) {
+                    if ([weakSelf.diskCachePlist[key] isKindOfClass:[NSDate class]]) {
                         
-                        if([_diskCachePlist[key] timeIntervalSinceReferenceDate] <= now) {
+                        if([weakSelf.diskCachePlist[key] timeIntervalSinceReferenceDate] <= now) {
                             
                             isChange = YES;
                             [fileManager removeItemAtPath:cachePathForKey(key) error:NULL];
@@ -86,8 +89,8 @@ static inline NSString *cachePathForKey(NSString* key) {
                 }
                 if (isChange) {
                     
-                    _diskCachePlist = removedKeys;
-                    [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+                    weakSelf.diskCachePlist = removedKeys;
+                    [weakSelf.diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
                 }
             });
         } else {
@@ -117,9 +120,9 @@ static inline NSString *cachePathForKey(NSString* key) {
 
 #pragma mark -
 #pragma mark - cacheSize methods
-- (NSUInteger)getAllCacheSize {
+- (unsigned long long)getAllCacheSize {
     
-    NSUInteger size = 0;
+    unsigned long long size = 0;
     
     for (NSString *key in [self allKeys]) {
         
@@ -130,9 +133,9 @@ static inline NSString *cachePathForKey(NSString* key) {
     return size;
 }
 
-- (NSUInteger)getSingleCacheSizeForKey:(NSString *)key {
+- (unsigned long long)getSingleCacheSizeForKey:(NSString *)key {
     
-    NSUInteger size = 0;
+    unsigned long long size = 0;
     
     NSFileManager* manager = [NSFileManager defaultManager];
     
@@ -167,14 +170,16 @@ static inline NSString *cachePathForKey(NSString* key) {
 #pragma mark - remove methods
 - (void)clearAllCache {
     
+    __weak typeof(self)weakSelf = self;
+    
     dispatch_sync(_cacheInfoQueue, ^{
         
-        for(NSString* key in _diskCachePlist) {
+        for(NSString* key in weakSelf.diskCachePlist) {
             [[NSFileManager defaultManager] removeItemAtPath:cachePathForKey(key) error:NULL];
         }
         
-        [_diskCachePlist removeAllObjects];
-        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+        [weakSelf.diskCachePlist removeAllObjects];
+        [weakSelf.diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
         [self clearMemoryCache];
     });
     
@@ -188,16 +193,16 @@ static inline NSString *cachePathForKey(NSString* key) {
 
 - (void)removeCacheForKey:(NSString *)key {
     
-    NSAssert(![key isEqualToString:kDefaultPlist] , @"RENCache.plist 不可以删除");
+    NSAssert(![key isEqualToString:kDefaultPlist] , @"RENCache.plist 不可删除");
+    
+    __weak typeof(self)weakSelf = self;
     
     dispatch_async(_cacheInfoQueue, ^{
         
         [[NSFileManager defaultManager] removeItemAtPath:cachePathForKey(key) error:NULL];
-        [_diskCachePlist removeObjectForKey:key];
-        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
-        
-        [_memoryCache removeObjectForKey:key];
-        
+        [weakSelf.diskCachePlist removeObjectForKey:key];
+        [weakSelf.diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+        [weakSelf.memoryCache removeObjectForKey:key];
     });
 }
 
@@ -210,7 +215,6 @@ static inline NSString *cachePathForKey(NSString* key) {
     if (key) {
         
         NSData *data = [self objectForKey:key];
-        
         if (data) {
             image =  [UIImage imageWithData:data];
         }
@@ -249,14 +253,16 @@ static inline NSString *cachePathForKey(NSString* key) {
                 
                 if([_diskCachePlist[key] timeIntervalSinceReferenceDate] <= now) {
                     
+                    __weak typeof(self)weakSelf = self;
+                    
                     dispatch_async(_cacheInfoQueue, ^{
                         
                         [fileManager removeItemAtPath:cachePathForKey(key) error:NULL];
-                        [_diskCachePlist removeObjectForKey:key];
-                        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+                        [weakSelf.diskCachePlist removeObjectForKey:key];
+                        [weakSelf.diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
                         
-                        [_memoryCache removeObjectForKey:key];
-        
+                        [weakSelf.memoryCache removeObjectForKey:key];
+                        
                     });
                     return nil;
                 }
@@ -301,12 +307,14 @@ static inline NSString *cachePathForKey(NSString* key) {
     
     NSAssert(![key isEqualToString:kDefaultPlist] , @"RENCache.plist 不可保存或修改默认的plist");
     
+    __weak typeof(self)weakSelf = self;
+    
     dispatch_sync(_cacheInfoQueue, ^{
         
         [value writeToFile:cachePathForKey(key) atomically:YES];
         id obj = timeoutInterval > 0 ? [NSDate dateWithTimeIntervalSinceNow:timeoutInterval] : @0;
-        [_diskCachePlist setObject:obj forKey:key];
-        [_diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
+        [weakSelf.diskCachePlist setObject:obj forKey:key];
+        [weakSelf.diskCachePlist writeToFile:cachePathForKey(kDefaultPlist) atomically:YES];
     });
     
 }
@@ -317,5 +325,6 @@ static inline NSString *cachePathForKey(NSString* key) {
     _defaultCacheMemoryLimit = defaultCacheMemoryLimit;
     _memoryCache.countLimit = defaultCacheMemoryLimit;
 }
+
 
 @end

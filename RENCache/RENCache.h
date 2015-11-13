@@ -30,9 +30,9 @@
 /// 获取磁盘缓存个数
 - (NSUInteger)getAllCacheCount;
 /// 获取磁盘全部缓存大小
-- (NSUInteger)getAllCacheSize;
+- (unsigned long long)getAllCacheSize;
 /// 获取单个缓存的大小
-- (NSUInteger)getSingleCacheSizeForKey:(NSString *)key;
+- (unsigned long long)getSingleCacheSizeForKey:(NSString *)key;
 
 
 /// 清除全部缓存（包括内存中的缓存）
