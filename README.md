@@ -1,6 +1,14 @@
 # RENCache
 
+### CocoaPods
+* 在 `Podfile` 里添加以下依赖：
 
+```
+pod 'RENCache', '~> 1.0.1'
+```
+* 运行 `pod install`
+
+### 使用
 ````
 /// 默认缓存过期时间无限,可设置默认缓存时长（秒）
 @property(nonatomic) NSTimeInterval defaultTimeoutInterval;
